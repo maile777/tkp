@@ -95,8 +95,8 @@ export class ShoulderWebAR {
         const loader = new GLTFLoader();
         try {
             this.character = await new Promise((resolve, reject) => {
-                // モデルのパスを適切に設定
-                const modelPath = './models/takopi_ふわふわ4.glb';  // リポジトリ内の適切なパスに修正
+                // リポジトリ名を含めたパスに修正
+                const modelPath = '/tkp/models/takopi_ふわふわ4.glb';  
                 loader.load(
                     modelPath,
                     (gltf) => {
@@ -112,6 +112,7 @@ export class ShoulderWebAR {
                 );
             });
         } catch (error) {
+            console.error('モデル読み込みエラー:', error);
             throw new Error('3Dモデルの読み込みに失敗しました：' + error.message);
         }
     }

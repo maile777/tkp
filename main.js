@@ -1,3 +1,5 @@
+import { ShoulderWebAR } from './shoulderAR.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const ar = new ShoulderWebAR();

@@ -1,4 +1,4 @@
-class ShoulderWebAR {
+export class ShoulderWebAR {
     constructor() {
         this.initialize();
     }

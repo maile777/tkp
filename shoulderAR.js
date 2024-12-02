@@ -93,19 +93,27 @@ export class ShoulderWebAR {
 
     async loadCharacterModel() {
         const loader = new GLTFLoader();
-        this.character = await new Promise((resolve, reject) => {
-            loader.load(
-                'takopi_ふわふわ4.glb',
-                (gltf) => {
-                    const model = gltf.scene;
-                    model.scale.set(0.5, 0.5, 0.5);
-                    this.scene.add(model);
-                    resolve(model);
-                },
-                undefined,
-                reject
-            );
-        });
+        try {
+            this.character = await new Promise((resolve, reject) => {
+                // モデルのパスを適切に設定
+                const modelPath = './models/takopi_ふわふわ4.glb';  // リポジトリ内の適切なパスに修正
+                loader.load(
+                    modelPath,
+                    (gltf) => {
+                        const model = gltf.scene;
+                        model.scale.set(0.5, 0.5, 0.5);
+                        this.scene.add(model);
+                        resolve(model);
+                    },
+                    (progress) => {
+                        console.log('モデル読み込み進捗:', (progress.loaded / progress.total * 100) + '%');
+                    },
+                    reject
+                );
+            });
+        } catch (error) {
+            throw new Error('3Dモデルの読み込みに失敗しました：' + error.message);
+        }
     }
 
     updateCharacterPosition(landmarks) {

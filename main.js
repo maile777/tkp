@@ -1,12 +1,18 @@
 import { ShoulderWebAR } from './shoulderAR.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const loadingMessage = document.getElementById('loadingMessage');
+    loadingMessage.style.display = 'block';
+
     try {
         const ar = new ShoulderWebAR();
-        document.getElementById('loadingMessage').style.display = 'none';
+        await ar.initialize();
+        loadingMessage.style.display = 'none';
     } catch (error) {
         console.error('AR初期化エラー:', error);
-        document.getElementById('loadingMessage').textContent = 
-            'ARの初期化に失敗しました。デバイスとブラウザの互換性を確認してください。';
+        loadingMessage.textContent = 
+            'エラーが発生しました：' + error.message + '\n' +
+            'カメラへのアクセスを許可してください。';
+        loadingMessage.style.display = 'block';
     }
 });

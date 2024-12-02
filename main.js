@@ -1,6 +1,6 @@
 import { ShoulderWebAR } from './shoulderAR.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('load', async () => {
     const loadingMessage = document.getElementById('loadingMessage');
     loadingMessage.style.display = 'block';
 

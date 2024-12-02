@@ -1,34 +1,29 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 export class ShoulderWebAR {
     constructor() {
-        this.initialize();
+        // THREE を window オブジェクトに追加
+        window.THREE = THREE;
+        
+        this.scene = null;
+        this.camera = null;
+        this.renderer = null;
+        this.character = null;
+        this.pose = null;
     }
 
     async initialize() {
-        // 必要なライブラリの読み込み
-        await this.loadDependencies();
-        
-        // Three.jsの初期設定
-        this.setupThreeJS();
-        
-        // カメラストリームのセットアップ
-        await this.setupCamera();
-        
-        // MediaPipe Poseの初期化
-        await this.setupPoseDetection();
-        
-        // 3Dモデルのロード
-        await this.loadCharacterModel();
-        
-        // メインループの開始
-        this.animate();
-    }
-
-    async loadDependencies() {
-        // MediaPipe Poseの読み込み
-        await Promise.all([
-            this.loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose.js'),
-            this.loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js')
-        ]);
+        try {
+            this.setupThreeJS();
+            await this.setupCamera();
+            await this.setupPoseDetection();
+            await this.loadCharacterModel();
+            this.animate();
+        } catch (error) {
+            console.error('初期化エラー:', error);
+            throw error;
+        }
     }
 
     setupThreeJS() {
@@ -53,21 +48,33 @@ export class ShoulderWebAR {
     }
 
     async setupCamera() {
-        const video = document.getElementById('videoElement');
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            }
-        });
-        video.srcObject = stream;
-        await new Promise((resolve) => {
-            video.onloadedmetadata = () => {
-                video.play();
-                resolve();
-            };
-        });
+        try {
+            const video = document.getElementById('videoElement');
+            // デバイスの種類に関係なく最適な設定を使用
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'user'  // 内カメラを優先
+                }
+            });
+            video.srcObject = stream;
+            
+            // ビデオの準備完了を待つ
+            await new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play().catch(err => {
+                        console.error('ビデオの再生に失敗:', err);
+                    });
+                    resolve();
+                };
+            });
+            
+            console.log('カメラのセットアップ完了');
+        } catch (error) {
+            console.error('カメラのセットアップエラー:', error);
+            throw new Error('カメラの初期化に失敗しました。カメラへのアクセスを許可し、カメラが正しく接続されていることを確認してください。');
+        }
     }
 
     async setupPoseDetection() {
